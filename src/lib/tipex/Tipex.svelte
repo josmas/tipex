@@ -71,16 +71,17 @@
 		 * Whether the editor should is focused, bind.
 		 */
 		focused?: boolean;
-    /**
-     * Whether the editor should have autofocus on mount.
-     */
-    autofocus?: boolean;
-	} & WithControlsX & (Boolish | NonBoolish);
+		/**
+		 * Whether the editor should have autofocus on mount.
+		 */
+		autofocus?: boolean;
+	} & WithControlsX &
+		(Boolish | NonBoolish);
 </script>
 
 <script lang="ts">
 	import { defaultExtensions } from './default.js';
-	import { onMount, setContext } from 'svelte';
+	import { onMount, onDestroy, setContext } from 'svelte';
 	import { Editor } from '@tiptap/core';
 	import StarterKit from '@tiptap/starter-kit';
 	import Controls from '../tipex/Controls.svelte';
@@ -93,18 +94,15 @@
 		tipex = $bindable(),
 		floating = false,
 		controls = false,
-		oncreate = () => {
-		},
-		ondestroy = () => {
-		},
-		onupdate = () => {
-		},
+		oncreate = () => {},
+		ondestroy = () => {},
+		onupdate = () => {},
 		body = '',
 		class: className = '',
 		style = '',
 		focal = true,
 		focused = $bindable(false),
-    autofocus = true,
+		autofocus = true,
 		head,
 		controlComponent,
 		utilities,
@@ -121,13 +119,28 @@
 		focused = !!(editorsParentRef && editorsParentRef.contains(document.activeElement));
 	}
 
+	// Prevent unnecessary re-renders that can interrupt clicks
+	let transactionTimeoutId: ReturnType<typeof setTimeout> | undefined;
+	function handleTransaction({ editor }: { editor: any }) {
+		// Debounce re-renders to prevent interrupting user interactions
+		if (transactionTimeoutId) {
+			clearTimeout(transactionTimeoutId);
+		}
+
+		transactionTimeoutId = setTimeout(() => {
+			if (tipex !== editor) {
+				tipex = editor;
+			}
+		}, 0);
+	}
+
 	let floatingRef: HTMLDivElement | undefined = $state();
 	let tipexEditorRef: HTMLDivElement | undefined = $state();
 	let editorsParentRef: HTMLDivElement | undefined = $state();
 
 	onMount(() => {
-		if (floating && !extensions.find(ext => ext.name === 'floatingMenu') && floatingRef) {
-			extensions.push(getDefaultFloatingMenu(floatingRef));
+		if (floating && !extensions.find((ext) => ext.name === 'floatingMenu') && floatingRef) {
+			extensions.push(getDefaultFloatingMenu(floatingRef, editorsParentRef));
 		}
 		tipex = new Editor({
 			element: tipexEditorRef,
@@ -138,17 +151,19 @@
 				...extensions
 			],
 			content: body as string,
-			onTransaction({ editor }) {
-				// force re-render so `tipex.isActive` works as expected
-				tipex = undefined;
-				tipex = editor;
-			},
+			onTransaction: handleTransaction,
 			autofocus: autofocus,
 			onCreate: oncreate,
 			onDestroy: ondestroy,
 			onUpdate: onupdate
 		});
 		setContext(ctxId, tipex);
+	});
+
+	onDestroy(() => {
+		if (transactionTimeoutId) {
+			clearTimeout(transactionTimeoutId);
+		}
 	});
 </script>
 
@@ -158,7 +173,13 @@
 	<LinkFloatingMenu bind:floatingRef {tipex} />
 {/if}
 
-<div class="tipex-editor {className}" {style} bind:this={editorsParentRef} class:focused class:focal>
+<div
+	class="tipex-editor {className}"
+	{style}
+	bind:this={editorsParentRef}
+	class:focused
+	class:focal
+>
 	<div class="tipex-editor-wrap">
 		{@render head?.(tipex)}
 		<div class="tipex-editor-section" bind:this={tipexEditorRef}></div>

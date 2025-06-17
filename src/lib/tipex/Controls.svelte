@@ -18,13 +18,32 @@
 	import Fa6SolidCode from './icons/Fa6SolidCode.svelte';
 
 	let { children, tipex }: ControlsProps = $props();
+
+	// Handle button clicks without aggressive focus management
+	function handleControlClick(event: MouseEvent, action: () => void) {
+		event.stopPropagation();
+		event.preventDefault();
+
+		const editorElement = tipex?.view?.dom;
+		const isEditorFocused =
+			editorElement &&
+			document.activeElement &&
+			(editorElement === document.activeElement || editorElement.contains(document.activeElement));
+
+		if (!isEditorFocused) {
+			tipex?.chain().focus().run();
+		}
+
+		action();
+	}
 </script>
 
 {#if tipex}
 	<div class="tipex-controller">
 		<div class="tipex-basic-controller-wrapper">
 			<button
-				onclick={() => tipex?.chain().focus().toggleHeading({ level: 1 }).run()}
+				onclick={(event) =>
+					handleControlClick(event, () => tipex?.chain().toggleHeading({ level: 1 }).run())}
 				class:active={tipex?.isActive('heading', { level: 1 })}
 				class="tipex-edit-button tipex-button-extra tipex-button-rigid"
 				aria-label="Heading 1"
@@ -34,7 +53,8 @@
 			</button>
 
 			<button
-				onclick={() => tipex?.chain().focus().toggleHeading({ level: 2 }).run()}
+				onclick={(event) =>
+					handleControlClick(event, () => tipex?.chain().toggleHeading({ level: 2 }).run())}
 				class:active={tipex?.isActive('heading', { level: 2 })}
 				class="tipex-edit-button tipex-button-extra tipex-button-rigid"
 				aria-label="Heading 2"
@@ -44,7 +64,7 @@
 			</button>
 
 			<button
-				onclick={() => tipex?.chain().focus().setParagraph().run()}
+				onclick={(event) => handleControlClick(event, () => tipex?.chain().setParagraph().run())}
 				class:active={tipex?.isActive('paragraph')}
 				class="tipex-edit-button tipex-button-extra tipex-button-rigid"
 				aria-label="Paragraph/Normal text"
@@ -54,7 +74,7 @@
 			</button>
 
 			<button
-				onclick={() => tipex?.chain().focus().toggleBold().run()}
+				onclick={(event) => handleControlClick(event, () => tipex?.chain().toggleBold().run())}
 				class:active={tipex?.isActive('bold')}
 				class="tipex-edit-button tipex-button-extra tipex-button-rigid"
 				aria-label="Bold"
@@ -64,7 +84,7 @@
 			</button>
 
 			<button
-				onclick={() => tipex?.chain().focus().toggleItalic().run()}
+				onclick={(event) => handleControlClick(event, () => tipex?.chain().toggleItalic().run())}
 				class:active={tipex?.isActive('italic')}
 				class="tipex-edit-button tipex-button-extra tipex-button-rigid"
 				aria-label="Italic"
@@ -74,7 +94,7 @@
 			</button>
 
 			<button
-				onclick={() => tipex?.chain().focus().toggleCode().run()}
+				onclick={(event) => handleControlClick(event, () => tipex?.chain().toggleCode().run())}
 				class:active={tipex?.isActive('code')}
 				class="tipex-edit-button tipex-button-extra tipex-button-rigid"
 				aria-label="Code"
@@ -82,7 +102,6 @@
 			>
 				<Fa6SolidCode display class="h-4 w-4" />
 			</button>
-
 		</div>
 		{@render children?.()}
 	</div>

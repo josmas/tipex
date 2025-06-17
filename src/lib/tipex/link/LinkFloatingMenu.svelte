@@ -17,9 +17,20 @@
 
 	let { floatingRef = $bindable(), tipex }: LinkFloatingMenuProps = $props();
 
+	// Handle floating menu clicks without aggressive focus management
+	function handleFloatingClick(event: MouseEvent, action: () => void) {
+		event.stopPropagation();
+		event.preventDefault();
+
+		action();
+	}
+
 	function handleAcceptLink() {
 		if (tipex instanceof Editor) {
-			tipex.chain().focus(tipex.state.selection.$anchor.pos - tipex.state.selection.$anchor.parentOffset).run();
+			tipex
+				.chain()
+				.focus(tipex.state.selection.$anchor.pos - tipex.state.selection.$anchor.parentOffset)
+				.run();
 		}
 	}
 
@@ -31,7 +42,11 @@
 
 	function handleOpenLink() {
 		if (tipex instanceof Editor) {
-			window.open(tipex.getAttributes('link').href, 'popup', `width=700,height=900,location=0,top=0,right=0`);
+			window.open(
+				tipex.getAttributes('link').href,
+				'popup',
+				`width=700,height=900,location=0,top=0,right=0`
+			);
 		}
 	}
 
@@ -44,17 +59,34 @@
 	});
 </script>
 
-<div class="tipex-floating-group"
-		 bind:this={floatingRef}
-		 style={computedStyleString}
-		 transition:fade>
-	<button type="button" class="tipex-floating-button" onclick={handleOpenLink} aria-label="Open link in new tab">
-		<Fa6SolidArrowUpRightFromSquare display class="h-3 w-3"/>
+<div
+	class="tipex-floating-group"
+	bind:this={floatingRef}
+	style={computedStyleString}
+	transition:fade
+>
+	<button
+		type="button"
+		class="tipex-floating-button"
+		onclick={(event) => handleFloatingClick(event, handleOpenLink)}
+		aria-label="Open link in new tab"
+	>
+		<Fa6SolidArrowUpRightFromSquare display class="h-3 w-3" />
 	</button>
-	<button type="button" class="tipex-floating-button" onclick={handleAcceptLink} aria-label="Accept link">
-		<Fa6SolidCheck display class="h-3 w-3"/>
+	<button
+		type="button"
+		class="tipex-floating-button"
+		onclick={(event) => handleFloatingClick(event, handleAcceptLink)}
+		aria-label="Accept link"
+	>
+		<Fa6SolidCheck display class="h-3 w-3" />
 	</button>
-	<button type="button" class="tipex-floating-button" onclick={handleCancelLink} aria-label="Cancel link">
-		<Fa6SolidXmark display class="h-3 w-3"/>
+	<button
+		type="button"
+		class="tipex-floating-button"
+		onclick={(event) => handleFloatingClick(event, handleCancelLink)}
+		aria-label="Cancel link"
+	>
+		<Fa6SolidXmark display class="h-3 w-3" />
 	</button>
 </div>

@@ -1,6 +1,6 @@
 import { FloatingMenu } from '@tiptap/extension-floating-menu';
 
-export function getDefaultFloatingMenu(editLinkRef: HTMLElement) {
+export function getDefaultFloatingMenu(editLinkRef: HTMLElement, parentElement?: HTMLElement) {
 	return FloatingMenu.configure({
 		pluginKey: 'floatingLinkEdit',
 		element: editLinkRef,
@@ -9,12 +9,13 @@ export function getDefaultFloatingMenu(editLinkRef: HTMLElement) {
 		},
 		tippyOptions: {
 			placement: 'top-start',
-			zIndex: 0,
+			zIndex: 1000, // Higher z-index to avoid conflicts with form elements
 			popperOptions: {
 				placement: 'top-start',
 				strategy: 'fixed'
 			},
-			appendTo: () => document.body
+			// Append to parent element if provided (for form contexts)
+			appendTo: () => parentElement || document.body
 		}
 	});
 }

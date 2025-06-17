@@ -16,18 +16,36 @@
 
 	let enableLinkEdit = $state(false);
 
+	// Handle utility clicks without aggressive focus management
+	function handleUtilityClick(event: MouseEvent, action: () => void) {
+		event.stopPropagation();
+		event.preventDefault();
+
+		const editorElement = tipex?.view?.dom;
+		const isEditorFocused =
+			editorElement &&
+			document.activeElement &&
+			(editorElement === document.activeElement || editorElement.contains(document.activeElement));
+
+		if (!isEditorFocused) {
+			tipex?.chain().focus().run();
+		}
+
+		action();
+	}
+
 	function copy() {
 		navigator.clipboard.writeText(tipex?.getHTML() || '');
-		tipex?.chain().focus().run();
 	}
 </script>
 
 {#if !enableLinkEdit}
 	<button
 		class="tipex-edit-button tipex-button-extra tipex-button-rigid"
-		onclick={copy}
+		onclick={(event) => handleUtilityClick(event, copy)}
 		type="button"
-		aria-label="Copy HTML">
+		aria-label="Copy HTML"
+	>
 		<Fa6SolidCopy display class="h-4 w-4" />
 	</button>
 	{@render children?.()}
