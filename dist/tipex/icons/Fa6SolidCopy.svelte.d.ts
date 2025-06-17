@@ -1,0 +1,9 @@
+export interface Fa6SolidCopyProps {
+    display?: boolean;
+    occupy?: boolean;
+    size?: number;
+    class?: string;
+}
+declare const Fa6SolidCopy: import("svelte").Component<Fa6SolidCopyProps, {}, "">;
+type Fa6SolidCopy = ReturnType<typeof Fa6SolidCopy>;
+export default Fa6SolidCopy;

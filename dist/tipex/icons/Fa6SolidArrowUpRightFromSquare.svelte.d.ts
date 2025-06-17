@@ -1,0 +1,9 @@
+export interface Fa6SolidArrowUpRightFromSquareProps {
+    display?: boolean;
+    occupy?: boolean;
+    size?: number;
+    class?: string;
+}
+declare const Fa6SolidArrowUpRightFromSquare: import("svelte").Component<Fa6SolidArrowUpRightFromSquareProps, {}, "">;
+type Fa6SolidArrowUpRightFromSquare = ReturnType<typeof Fa6SolidArrowUpRightFromSquare>;
+export default Fa6SolidArrowUpRightFromSquare;
