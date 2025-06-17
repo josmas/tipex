@@ -82,28 +82,28 @@ export function isFormCriticalEvent(eventType) {
  * Enhanced event handling that respects form context and library requirements
  */
 export function handleFormAwareEvent(event, editorElement, action) {
-    const formContext = editorElement ? findFormContext(editorElement) :
-        { inForm: false, formElement: null, isSuperform: false, formLibraryDetected: null };
+    const formContext = editorElement
+        ? findFormContext(editorElement)
+        : { inForm: false, formElement: null, isSuperform: false, formLibraryDetected: null };
+    // Debug logging to help troubleshoot issues
+    if (typeof window !== 'undefined' && window.__TIPEX_DEBUG) {
+        console.log('Tipex form-aware event:', {
+            eventType: event.type,
+            target: event.target,
+            formContext,
+            editorElement
+        });
+    }
     // For form contexts, use more selective event handling
     if (formContext.inForm) {
         // Always prevent default to stop unwanted form behaviors
         event.preventDefault();
-        // Only stop propagation if it's not a form-critical event
-        const isFormCritical = isFormCriticalEvent(event.type);
-        if (!isFormCritical) {
-            // For Superforms and other libraries, be more careful about stopping propagation
-            if (formContext.isSuperform || formContext.formLibraryDetected) {
-                // Only stop propagation for click events on buttons
-                if (event.type === 'click' && event.target instanceof HTMLButtonElement) {
-                    event.stopPropagation();
-                }
-                // Allow other events to bubble for form state management
-            }
-            else {
-                // For vanilla forms, safe to stop propagation
-                event.stopPropagation();
-            }
+        // For ANY form context, be very conservative about stopping propagation
+        // Only stop propagation for button clicks, allow everything else to bubble
+        if (event.type === 'click' && event.target instanceof HTMLButtonElement) {
+            event.stopPropagation();
         }
+        // Let all other events bubble up for form state management
     }
     else {
         // Original behavior for non-form contexts
@@ -123,20 +123,14 @@ export function handleFormAwareFocus(tipex, editorElement, formContext) {
     const isEditorFocused = document.activeElement &&
         (editorElement === document.activeElement || editorElement.contains(document.activeElement));
     if (!isEditorFocused) {
-        if (context.inForm && context.isSuperform) {
-            // For Superforms, use a more gentle focus approach to avoid conflicts
+        if (context.inForm) {
+            // For ALL forms, use a gentle focus approach to avoid conflicts
             setTimeout(() => {
                 // Double-check focus state after timeout to avoid conflicts
                 if (!document.activeElement || !editorElement.contains(document.activeElement)) {
                     tipex.chain().focus().run();
                 }
             }, 0);
-        }
-        else if (context.inForm) {
-            // For other form libraries, use a slight delay to avoid timing issues
-            requestAnimationFrame(() => {
-                tipex.chain().focus().run();
-            });
         }
         else {
             // For non-form contexts, immediate focus is fine

@@ -23,12 +23,12 @@
 	// Enhanced event handling using shared utilities
 	function handleControlClick(event: MouseEvent, action: () => void) {
 		const editorElement = tipex?.view?.dom;
-		
+
 		// Use shared form-aware event handling
 		handleFormAwareEvent(event, editorElement, () => {
 			// Handle focus management
 			handleFormAwareFocus(tipex, editorElement);
-			
+
 			// Execute the action
 			action();
 		});

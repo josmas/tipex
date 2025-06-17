@@ -21,7 +21,7 @@
 	// Enhanced event handling using shared utilities
 	function handleFloatingClick(event: MouseEvent, action: () => void) {
 		const editorElement = tipex?.view?.dom;
-		
+
 		// Use shared form-aware event handling
 		handleFormAwareEvent(event, editorElement, action);
 	}

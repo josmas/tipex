@@ -19,7 +19,7 @@
 	// Enhanced event handling using shared utilities
 	function handleButtonClick(event: MouseEvent, action: () => void) {
 		const editorElement = tipex?.view?.dom;
-		
+
 		// Use shared form-aware event handling
 		handleFormAwareEvent(event, editorElement, action);
 	}
@@ -66,7 +66,7 @@
 
 <button
 	onclick={(event) => handleButtonClick(event, handleEditLinkToggle)}
-	class="tipex-edit-button tipex-button-extra tipex-button-rigid"  
+	class="tipex-edit-button tipex-button-extra tipex-button-rigid"
 	class:active={enableLinkEdit}
 	aria-label="Edit link"
 	type="button"
