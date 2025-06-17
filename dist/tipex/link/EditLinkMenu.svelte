@@ -10,10 +10,19 @@
 <script lang="ts">
 	import Fa6SolidXmark from '../icons/Fa6SolidXmark.svelte';
 	import Fa6SolidLink from '../icons/Fa6SolidLink.svelte';
+	import { handleFormAwareEvent } from '../form-utils.js';
 
 	let { enableLinkEdit = $bindable(false), tipex }: EditLinkMenuProps = $props();
 
 	let linkInputRef: HTMLInputElement | undefined = $state();
+
+	// Enhanced event handling using shared utilities
+	function handleButtonClick(event: MouseEvent, action: () => void) {
+		const editorElement = tipex?.view?.dom;
+		
+		// Use shared form-aware event handling
+		handleFormAwareEvent(event, editorElement, action);
+	}
 
 	function handleLinkAndSave() {
 		if (!linkInputRef) return;
@@ -56,8 +65,8 @@
 </script>
 
 <button
-	onclick={handleEditLinkToggle}
-	class="tipex-edit-button tipex-button-extra tipex-button-rigid"
+	onclick={(event) => handleButtonClick(event, handleEditLinkToggle)}
+	class="tipex-edit-button tipex-button-extra tipex-button-rigid"  
 	class:active={enableLinkEdit}
 	aria-label="Edit link"
 	type="button"
@@ -80,7 +89,7 @@
 		<button
 			class="tipex-edit-button tipex-button-extra tipex-button-free"
 			type="button"
-			onclick={handleLinkAndSave}
+			onclick={(event) => handleButtonClick(event, handleLinkAndSave)}
 		>
 			Save
 		</button>

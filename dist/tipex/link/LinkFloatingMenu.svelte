@@ -14,15 +14,16 @@
 	import Fa6SolidXmark from '../icons/Fa6SolidXmark.svelte';
 	import Fa6SolidCheck from '../icons/Fa6SolidCheck.svelte';
 	import Fa6SolidArrowUpRightFromSquare from '../icons/Fa6SolidArrowUpRightFromSquare.svelte';
+	import { handleFormAwareEvent } from '../form-utils.js';
 
 	let { floatingRef = $bindable(), tipex }: LinkFloatingMenuProps = $props();
 
-	// Handle floating menu clicks without aggressive focus management
+	// Enhanced event handling using shared utilities
 	function handleFloatingClick(event: MouseEvent, action: () => void) {
-		event.stopPropagation();
-		event.preventDefault();
-
-		action();
+		const editorElement = tipex?.view?.dom;
+		
+		// Use shared form-aware event handling
+		handleFormAwareEvent(event, editorElement, action);
 	}
 
 	function handleAcceptLink() {

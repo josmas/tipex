@@ -11,27 +11,24 @@
 
 <script lang="ts">
 	import Fa6SolidCopy from './icons/Fa6SolidCopy.svelte';
+	import { handleFormAwareEvent, handleFormAwareFocus } from './form-utils.js';
 
 	let { children, tipex }: UtilityProps = $props();
 
 	let enableLinkEdit = $state(false);
 
-	// Handle utility clicks without aggressive focus management
+	// Enhanced event handling using shared utilities
 	function handleUtilityClick(event: MouseEvent, action: () => void) {
-		event.stopPropagation();
-		event.preventDefault();
-
 		const editorElement = tipex?.view?.dom;
-		const isEditorFocused =
-			editorElement &&
-			document.activeElement &&
-			(editorElement === document.activeElement || editorElement.contains(document.activeElement));
 
-		if (!isEditorFocused) {
-			tipex?.chain().focus().run();
-		}
+		// Use shared form-aware event handling
+		handleFormAwareEvent(event, editorElement, () => {
+			// Handle focus management
+			handleFormAwareFocus(tipex, editorElement);
 
-		action();
+			// Execute the action
+			action();
+		});
 	}
 
 	function copy() {

@@ -16,25 +16,22 @@
 	import Fa6SolidBold from './icons/Fa6SolidBold.svelte';
 	import Fa6SolidItalic from './icons/Fa6SolidItalic.svelte';
 	import Fa6SolidCode from './icons/Fa6SolidCode.svelte';
+	import { handleFormAwareEvent, handleFormAwareFocus } from './form-utils.js';
 
 	let { children, tipex }: ControlsProps = $props();
 
-	// Handle button clicks without aggressive focus management
+	// Enhanced event handling using shared utilities
 	function handleControlClick(event: MouseEvent, action: () => void) {
-		event.stopPropagation();
-		event.preventDefault();
-
 		const editorElement = tipex?.view?.dom;
-		const isEditorFocused =
-			editorElement &&
-			document.activeElement &&
-			(editorElement === document.activeElement || editorElement.contains(document.activeElement));
-
-		if (!isEditorFocused) {
-			tipex?.chain().focus().run();
-		}
-
-		action();
+		
+		// Use shared form-aware event handling
+		handleFormAwareEvent(event, editorElement, () => {
+			// Handle focus management
+			handleFormAwareFocus(tipex, editorElement);
+			
+			// Execute the action
+			action();
+		});
 	}
 </script>
 
